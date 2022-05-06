@@ -1,4 +1,4 @@
-class Author {
+struct Author {
     var name: String
     var surname: String
     var yob: Int?
@@ -24,3 +24,6 @@ class Work {
     }
 }
 
+class Book: Work {}
+class Video: Work {}
+class Music: Work {}
