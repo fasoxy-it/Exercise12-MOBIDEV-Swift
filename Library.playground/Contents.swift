@@ -1,4 +1,5 @@
-struct Author {
+import Foundation
+struct Author: CustomStringConvertible {
     var name: String
     var surname: String
     var yob: Int?
@@ -10,15 +11,13 @@ struct Author {
         self.surname = surname
         works = [Work]()
     }
-}
-
-extension Author: CustomStringConvertible {
+    
     var description: String {
         return "\(name) \(surname)"
     }
 }
 
-class Work {
+class Work: CustomStringConvertible {
     var title: String
     var year: Int
     var author: Author
@@ -28,11 +27,9 @@ class Work {
         self.year = year
         self.author = author
     }
-}
-
-extension Work: CustomStringConvertible {
+    
     var description: String {
-        return "\(title) \(year) \(author)"
+        return "\(title) \(author) \(year)"
     }
 }
 
@@ -59,13 +56,124 @@ protocol Item {
     var work: Work {get}
 }
 
-var author: Author = Author(name: "Mattia", surname: "Fasoli")
-var work: Work = Work(withTitle: "appunti", createdBy: author, createdInYear: 2022)
-
-print(author)
-print(work)
-
-class Volume {
-    var book: Book
-    var availability:
+struct Position: CustomStringConvertible {
+    var shelfNumber: Int
+    var shelfPosition: Int
+    
+    var description: String {
+        return "\(shelfNumber) \(shelfPosition)"
+    }
 }
+
+protocol PhysicalItem: Item {
+    var position: Position {get set}
+}
+
+var author: Author = Author(name: "Mattia", surname: "Fasoli")
+var work: Work = Work(withTitle: "Appunti MOBIDEV", createdBy: author, createdInYear: 2022)
+var book: Book = Book(withTitle: "Appunti MC", createdBy: author, createdInYear: 2019)
+var position: Position = Position(shelfNumber: 2, shelfPosition: 3)
+
+class Volume: PhysicalItem, CustomStringConvertible {
+    var book: Book
+    var publisher: String
+    var availability: AvailabilityStatus
+    var position: Position
+    
+    init(forBook book: Book, pubishedBy publisher: String, withPosition position: Position) {
+        self.book = book
+        self.publisher = publisher
+        self.position = position
+        self.availability = .available
+    }
+    
+    var work: Work {
+        return book
+    }
+    
+    var description: String {
+        return "\(book) \(publisher) \(position)"
+    }
+}
+
+var volume: Volume = Volume(forBook: book, pubishedBy: "UNIMI", withPosition: position)
+
+print(volume)
+
+class Ebook: Item, CustomStringConvertible {
+    var book: Book
+    var size: Float
+    var availability: AvailabilityStatus
+
+    init(forBook book: Book, withSize size: Float) {
+        self.book = book
+        self.size = size
+        self.availability = .available
+    }
+    
+    var work: Work {
+        return book
+    }
+    
+    var description: String {
+        return "\(book) \(size)"
+    }
+}
+
+var ebook: Ebook = Ebook(forBook: book, withSize: 35.55)
+
+print(ebook)
+
+class Dvd: PhysicalItem, CustomStringConvertible {
+    var video: Video
+    var number: Int
+    var availability: AvailabilityStatus
+    var position: Position
+    
+    init(forVideo video: Video, dvdNumber number: Int, withPosition position: Position) {
+        self.video = video
+        self.number = number
+        self.position = position
+        self.availability = .available
+    }
+    
+    var work: Work {
+        return video
+    }
+    
+    var description: String {
+        return "\(video) \(number) \(position)"
+    }
+}
+
+var video: Video = Video(withTitle: "Harry Potter", createdBy: author, createdInYear: 2002)
+var dvd: Dvd = Dvd(forVideo: video, dvdNumber: 7, withPosition: Position(shelfNumber: 20, shelfPosition: 30))
+
+print(dvd)
+
+class Cd: PhysicalItem, CustomStringConvertible {
+    var music: Music
+    var tracks: Int
+    var position: Position
+    var availability: AvailabilityStatus
+    
+    init(forMusic music: Music, withTracksNumber tracks: Int, withPosition position: Position) {
+        self.music = music
+        self.tracks = tracks
+        self.position = position
+        self.availability = .available
+    }
+    
+    var work: Work {
+        return music
+    }
+    
+    var description: String {
+        return "\(music) \(tracks) \(position)"
+    }
+}
+
+var music: Music = Music(withTitle: "Wrecked", createdBy: author, createdInYear: 2022)
+var cd: Cd = Cd(forMusic: music, withTracksNumber: 1, withPosition: Position(shelfNumber: 13, shelfPosition: 13))
+
+print(cd)
