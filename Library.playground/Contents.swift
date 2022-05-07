@@ -1,4 +1,3 @@
-import Foundation
 struct Author: CustomStringConvertible {
     var name: String
     var surname: String
@@ -36,7 +35,6 @@ class Work: CustomStringConvertible {
 class Book: Work {}
 class Video: Work {}
 class Music: Work {}
-
 
 enum AvailabilityStatus {
     case available
@@ -77,8 +75,8 @@ var position: Position = Position(shelfNumber: 2, shelfPosition: 3)
 class Volume: PhysicalItem, CustomStringConvertible {
     var book: Book
     var publisher: String
-    var availability: AvailabilityStatus
     var position: Position
+    var availability: AvailabilityStatus
     
     init(forBook book: Book, pubishedBy publisher: String, withPosition position: Position) {
         self.book = book
@@ -127,8 +125,8 @@ print(ebook)
 class Dvd: PhysicalItem, CustomStringConvertible {
     var video: Video
     var number: Int
-    var availability: AvailabilityStatus
     var position: Position
+    var availability: AvailabilityStatus
     
     init(forVideo video: Video, dvdNumber number: Int, withPosition position: Position) {
         self.video = video
@@ -146,7 +144,7 @@ class Dvd: PhysicalItem, CustomStringConvertible {
     }
 }
 
-var video: Video = Video(withTitle: "Harry Potter", createdBy: author, createdInYear: 2002)
+var video: Video = Video(withTitle: "Appunti MC: Swift", createdBy: author, createdInYear: 2002)
 var dvd: Dvd = Dvd(forVideo: video, dvdNumber: 7, withPosition: Position(shelfNumber: 20, shelfPosition: 30))
 
 print(dvd)
@@ -173,7 +171,7 @@ class Cd: PhysicalItem, CustomStringConvertible {
     }
 }
 
-var music: Music = Music(withTitle: "Wrecked", createdBy: author, createdInYear: 2022)
+var music: Music = Music(withTitle: "Appunti MC: Android", createdBy: author, createdInYear: 2022)
 var cd: Cd = Cd(forMusic: music, withTracksNumber: 1, withPosition: Position(shelfNumber: 13, shelfPosition: 13))
 
 print(cd)
