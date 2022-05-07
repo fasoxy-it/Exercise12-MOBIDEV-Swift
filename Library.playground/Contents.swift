@@ -1,3 +1,8 @@
+import Foundation
+import PlaygroundSupport
+
+PlaygroundPage.current.needsIndefiniteExecution = true
+
 struct Author: CustomStringConvertible {
     var name: String
     var surname: String
@@ -175,3 +180,34 @@ var music: Music = Music(withTitle: "Appunti MC: Android", createdBy: author, cr
 var cd: Cd = Cd(forMusic: music, withTracksNumber: 1, withPosition: Position(shelfNumber: 13, shelfPosition: 13))
 
 print(cd)
+
+let url = "https://ewserver.di.unimi.it/mobicomp/esercizi/library.json"
+guard let dataUrl = URL(string: url) else {
+    fatalError("Wrong Url Format")
+}
+
+let session = URLSession.shared
+let request = URLRequest(url: dataUrl)
+
+let task = session.dataTask(with: request, completionHandler: {data, response, error in
+    
+    guard error == nil else {
+        print("Connection error: \(error!)")
+        return
+    }
+
+    guard let statusCode = (response as? HTTPURLResponse)?.statusCode, statusCode == 200 else {
+        print("Status code different from OK")
+        return
+    }
+    
+    guard let dataFromServer = data, let dataParsed = try? JSONSerialization.jsonObject(with: dataFromServer, options: []) as? Dictionary<String, Any> else {
+        print("Can't deserialised answer form server")
+        return
+    }
+    
+    print(dataParsed)
+})
+
+task.resume()
+
