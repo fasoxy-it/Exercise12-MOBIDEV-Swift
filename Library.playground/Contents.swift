@@ -177,6 +177,24 @@ struct Library {
     let supports: [Item]
 }
 
+func getAuthorsByPseudonym(authors: [Author], withPseudonym pseudonym: String) -> [Author]? {
+    authors.filter{$0.pseudonym == pseudonym}
+}
+
+func getAuthorsByYob(authors: [Author], bornFrom yearFrom: Int, bornTo yearTo: Int) -> [Author]? {
+    authors.filter{$0.yob != nil && $0.yob! >= yearFrom && $0.yob! <= yearTo}
+}
+
+func getAuthorsMadeAtLeast(authors: [Author], madeAtLeastNumberOfWorks numberOfWorks: Int) -> [Author]? {
+    authors.filter{$0.works.count >= numberOfWorks}
+}
+
+func getAuthorsForWhichHaveSupports(library:Library, authorsForWhichHaveSupports numberOfSupports:UInt) -> [Author]?{
+    let supportAuthors = library.supports.map{$0.work.author!}
+    let authorTmpGroup = Dictionary(grouping: supportAuthors, by: {$0.surname})
+    return authorTmpGroup.filter{$1.count > numberOfSupports}.map{$1.first!}
+}
+
 let session = URLSession.shared
 let request = URLRequest(url: dataUrl)
 
@@ -266,6 +284,11 @@ let task = session.dataTask(with: request, completionHandler: {data, response, e
         .flatMap{$0}
 
     let myLibrary = Library(authors: allAuthors, supports: allSupports)
+    
+    print("Author with pseudonym Medicalfacts: \(getAuthorsByPseudonym(authors: myLibrary.authors, withPseudonym: "MedicalFacts")?.map{$0.surname} ?? ["Nessuno"])")
+    print("Authors borns between 1920 and 1970: \(getAuthorsByYob(authors: myLibrary.authors, bornFrom: 1920, bornTo: 1970)?.map{$0.surname} ?? ["Nessuno"])")
+    print("Authors with at least 2 works: \(getAuthorsMadeAtLeast(authors: myLibrary.authors, madeAtLeastNumberOfWorks: 2)?.map{$0.surname} ?? ["Nessuno"])")
+    print("Authors for which library has at least 2 supports: \(getAuthorsForWhichHaveSupports(library: myLibrary, authorsForWhichHaveSupports: 1)?.map{$0.surname} ?? ["Nessuno"])")
 })
 
 task.resume()
