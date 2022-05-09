@@ -10,14 +10,16 @@ struct Author: CustomStringConvertible {
     var pseudonym: String?
     var works: Array<Work>
     
-    init(name: String, surname: String) {
+    init(name: String, surname: String, yob: Int?, pseudonym: String?) {
         self.name = name
         self.surname = surname
+        self.yob = yob
+        self.pseudonym = pseudonym
         works = [Work]()
     }
     
     var description: String {
-        return "\(name) \(surname)"
+        return "\(name) \(surname) \(yob!)"
     }
 }
 
@@ -72,11 +74,6 @@ protocol PhysicalItem: Item {
     var position: Position {get set}
 }
 
-var author: Author = Author(name: "Mattia", surname: "Fasoli")
-var work: Work = Work(withTitle: "Appunti MOBIDEV", createdBy: author, createdInYear: 2022)
-var book: Book = Book(withTitle: "Appunti MC", createdBy: author, createdInYear: 2019)
-var position: Position = Position(shelfNumber: 2, shelfPosition: 3)
-
 class Volume: PhysicalItem, CustomStringConvertible {
     var book: Book
     var publisher: String
@@ -99,10 +96,6 @@ class Volume: PhysicalItem, CustomStringConvertible {
     }
 }
 
-var volume: Volume = Volume(forBook: book, pubishedBy: "UNIMI", withPosition: position)
-
-print(volume)
-
 class Ebook: Item, CustomStringConvertible {
     var book: Book
     var size: Float
@@ -122,10 +115,6 @@ class Ebook: Item, CustomStringConvertible {
         return "\(book) \(size)"
     }
 }
-
-var ebook: Ebook = Ebook(forBook: book, withSize: 35.55)
-
-print(ebook)
 
 class Dvd: PhysicalItem, CustomStringConvertible {
     var video: Video
@@ -149,11 +138,6 @@ class Dvd: PhysicalItem, CustomStringConvertible {
     }
 }
 
-var video: Video = Video(withTitle: "Appunti MC: Swift", createdBy: author, createdInYear: 2002)
-var dvd: Dvd = Dvd(forVideo: video, dvdNumber: 7, withPosition: Position(shelfNumber: 20, shelfPosition: 30))
-
-print(dvd)
-
 class Cd: PhysicalItem, CustomStringConvertible {
     var music: Music
     var tracks: Int
@@ -176,14 +160,13 @@ class Cd: PhysicalItem, CustomStringConvertible {
     }
 }
 
-var music: Music = Music(withTitle: "Appunti MC: Android", createdBy: author, createdInYear: 2022)
-var cd: Cd = Cd(forMusic: music, withTracksNumber: 1, withPosition: Position(shelfNumber: 13, shelfPosition: 13))
-
-print(cd)
-
 let url = "https://ewserver.di.unimi.it/mobicomp/esercizi/library.json"
 guard let dataUrl = URL(string: url) else {
     fatalError("Wrong Url Format")
+}
+
+struct AuthorSupportHelperModel {
+    let author: Author
 }
 
 let session = URLSession.shared
@@ -202,11 +185,27 @@ let task = session.dataTask(with: request, completionHandler: {data, response, e
     }
     
     guard let dataFromServer = data, let dataParsed = try? JSONSerialization.jsonObject(with: dataFromServer, options: []) as? Dictionary<String, Any> else {
-        print("Can't deserialised answer form server")
+        print("Can't deserialised answer from server")
         return
     }
     
-    print(dataParsed)
+    let authorItem = (dataParsed["authors"] as? [[String:Any]])?
+        .map{(authorDict:[String:Any]) -> AuthorSupportHelperModel in
+            
+            let author = Author(
+                name: authorDict["name"] as! String,
+                surname: authorDict["surname"] as! String,
+                yob: authorDict["yob"] as? Int,
+                pseudonym: authorDict["pseudonym"] as? String
+            )
+            
+            if let yob = author.yob, let pseudonym = author.pseudonym  {
+                print("\(author.name) \(author.surname) \(yob) \(pseudonym)")
+            }
+            
+            return AuthorSupportHelperModel(author: author)
+        }
+    
 })
 
 task.resume()
