@@ -272,7 +272,9 @@ let task = session.dataTask(with: request, completionHandler: {data, response, e
                 works: works
             )
             
-            author.works.forEach{$0.author = author}
+            author.works.forEach {
+                $0.author = author
+            }
             
             return AuthorSupportHelperModel(author: author, supports: supports)
         }
