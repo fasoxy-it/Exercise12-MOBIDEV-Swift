@@ -160,9 +160,11 @@ class Cd: PhysicalItem, CustomStringConvertible {
 }
 
 let url = "https://ewserver.di.unimi.it/mobicomp/esercizi/library.json"
+
 guard let dataUrl = URL(string: url) else {
     fatalError("Wrong Url Format")
 }
+
 struct Model {
     let authors: [Author] = []
 }
